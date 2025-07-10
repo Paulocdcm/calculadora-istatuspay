@@ -38,38 +38,43 @@ with tab1:
         valor_venda = st.number_input("Valor da venda", value=15000.0, min_value=1.0, step=100.0)
         tipo_calculo = st.radio("Tipo de Cálculo", ["Assumindo Juros", "Juros ao Cliente"])
         modalidade = st.selectbox("Modalidade", df_app["Modalidade"].dropna())
-        parcelas_disp = df_app[df_app["Modalidade"] == modalidade]["Parcelas"].unique()
-        qtd_parcelas = st.selectbox("Quantidade de Parcelas", parcelas_disp)
 
         executar = st.form_submit_button("Executar Simulação")
 
     if executar:
-        linha = df_app[(df_app["Modalidade"] == modalidade) & (df_app["Parcelas"] == qtd_parcelas)].iloc[0]
-        taxa = float(linha["Taxa (%)"])
+        # Filtra todas as linhas da modalidade escolhida
+        linhas = df_app[df_app["Modalidade"] == modalidade]
 
-        if tipo_calculo == "Assumindo Juros":
-            valor_parcela = (valor_venda / qtd_parcelas) if qtd_parcelas > 0 else 0
-            percentual = 1 - taxa
-            receber = valor_venda * percentual
+        resultados = []
+        for idx, linha in linhas.iterrows():
+            qtd_parcelas = int(linha["Parcelas"])
+            taxa = float(linha["Taxa (%)"])
 
-            st.subheader("Resultado da Simulação (Assumindo Juros)")
-            st.write(f"**Modalidade:** {modalidade}")
-            st.write(f"**Nº de Parcelas:** {qtd_parcelas}")
-            st.write(f"**Taxa:** {taxa:.4f} ({taxa*100:.2f}%)")
-            st.write(f"**Valor da Parcela:** R$ {valor_parcela:,.2f}")
-            st.write(f"**Valor a Receber:** R$ {receber:,.2f}")
+            if tipo_calculo == "Assumindo Juros":
+                valor_parcela = (valor_venda / qtd_parcelas) if qtd_parcelas > 0 else 0
+                percentual = 1 - taxa
+                receber = valor_venda * percentual
 
-        elif tipo_calculo == "Juros ao Cliente":
-            valor_total = valor_venda / (1 - taxa) if taxa < 1 else 0
-            valor_parcela = valor_total / qtd_parcelas if qtd_parcelas > 0 else 0
+                resultados.append({
+                    "Parcelas": qtd_parcelas,
+                    "Taxa (%)": f"{taxa*100:.2f}%",
+                    "Valor da Parcela": f"R$ {valor_parcela:,.2f}",
+                    "Valor a Receber": f"R$ {receber:,.2f}"
+                })
 
-            st.subheader("Resultado da Simulação (Juros ao Cliente)")
-            st.write(f"**Modalidade:** {modalidade}")
-            st.write(f"**Nº de Parcelas:** {qtd_parcelas}")
-            st.write(f"**Taxa:** {taxa:.4f} ({taxa*100:.2f}%)")
-            st.write(f"**Valor da Parcela:** R$ {valor_parcela:,.2f}")
-            st.write(f"**Valor Total:** R$ {valor_total:,.2f}")
+            elif tipo_calculo == "Juros ao Cliente":
+                valor_total = valor_venda / (1 - taxa) if taxa < 1 else 0
+                valor_parcela = valor_total / qtd_parcelas if qtd_parcelas > 0 else 0
 
+                resultados.append({
+                    "Parcelas": qtd_parcelas,
+                    "Taxa (%)": f"{taxa*100:.2f}%",
+                    "Valor da Parcela": f"R$ {valor_parcela:,.2f}",
+                    "Valor Total": f"R$ {valor_total:,.2f}"
+                })
+
+        st.subheader(f"Resultados para {modalidade}")
+        st.dataframe(pd.DataFrame(resultados))
         st.success("Simulação realizada com sucesso!")
     else:
         st.info("Preencha os dados e clique em 'Executar Simulação' para ver o resultado.")
@@ -85,38 +90,43 @@ with tab2:
         valor_venda = st.number_input("Valor da venda", value=15000.0, min_value=1.0, step=100.0, key="linkpgto_venda")
         tipo_calculo = st.radio("Tipo de Cálculo", ["Assumindo Juros", "Juros ao Cliente"], key="linkpgto_tipo")
         modalidade = st.selectbox("Modalidade", df_app["Modalidade"].dropna(), key="linkpgto_modalidade")
-        parcelas_disp = df_app[df_app["Modalidade"] == modalidade]["Parcelas"].unique()
-        qtd_parcelas = st.selectbox("Quantidade de Parcelas", parcelas_disp, key="linkpgto_parcelas")
 
         executar = st.form_submit_button("Executar Simulação")
 
     if executar:
-        linha = df_app[(df_app["Modalidade"] == modalidade) & (df_app["Parcelas"] == qtd_parcelas)].iloc[0]
-        taxa = float(linha["Taxa (%)"])
+        # Filtra todas as linhas da modalidade escolhida
+        linhas = df_app[df_app["Modalidade"] == modalidade]
 
-        if tipo_calculo == "Assumindo Juros":
-            valor_parcela = (valor_venda / qtd_parcelas) if qtd_parcelas > 0 else 0
-            percentual = 1 - taxa
-            receber = valor_venda * percentual
+        resultados = []
+        for idx, linha in linhas.iterrows():
+            qtd_parcelas = int(linha["Parcelas"])
+            taxa = float(linha["Taxa (%)"])
 
-            st.subheader("Resultado da Simulação (Assumindo Juros)")
-            st.write(f"**Modalidade:** {modalidade}")
-            st.write(f"**Nº de Parcelas:** {qtd_parcelas}")
-            st.write(f"**Taxa:** {taxa:.4f} ({taxa*100:.2f}%)")
-            st.write(f"**Valor da Parcela:** R$ {valor_parcela:,.2f}")
-            st.write(f"**Valor a Receber:** R$ {receber:,.2f}")
+            if tipo_calculo == "Assumindo Juros":
+                valor_parcela = (valor_venda / qtd_parcelas) if qtd_parcelas > 0 else 0
+                percentual = 1 - taxa
+                receber = valor_venda * percentual
 
-        elif tipo_calculo == "Juros ao Cliente":
-            valor_total = valor_venda / (1 - taxa) if taxa < 1 else 0
-            valor_parcela = valor_total / qtd_parcelas if qtd_parcelas > 0 else 0
+                resultados.append({
+                    "Parcelas": qtd_parcelas,
+                    "Taxa (%)": f"{taxa*100:.2f}%",
+                    "Valor da Parcela": f"R$ {valor_parcela:,.2f}",
+                    "Valor a Receber": f"R$ {receber:,.2f}"
+                })
 
-            st.subheader("Resultado da Simulação (Juros ao Cliente)")
-            st.write(f"**Modalidade:** {modalidade}")
-            st.write(f"**Nº de Parcelas:** {qtd_parcelas}")
-            st.write(f"**Taxa:** {taxa:.4f} ({taxa*100:.2f}%)")
-            st.write(f"**Valor da Parcela:** R$ {valor_parcela:,.2f}")
-            st.write(f"**Valor Total:** R$ {valor_total:,.2f}")
+            elif tipo_calculo == "Juros ao Cliente":
+                valor_total = valor_venda / (1 - taxa) if taxa < 1 else 0
+                valor_parcela = valor_total / qtd_parcelas if qtd_parcelas > 0 else 0
 
+                resultados.append({
+                    "Parcelas": qtd_parcelas,
+                    "Taxa (%)": f"{taxa*100:.2f}%",
+                    "Valor da Parcela": f"R$ {valor_parcela:,.2f}",
+                    "Valor Total": f"R$ {valor_total:,.2f}"
+                })
+
+        st.subheader(f"Resultados para {modalidade}")
+        st.dataframe(pd.DataFrame(resultados))
         st.success("Simulação realizada com sucesso!")
     else:
         st.info("Preencha os dados e clique em 'Executar Simulação' para ver o resultado.")
