@@ -89,7 +89,7 @@ with tab2:
         tipo_calculo = st.radio("Tipo de Cálculo", ["Assumindo Juros", "Juros ao Cliente"], key="linkpgto_tipo")
         modalidade = st.selectbox("Modalidade", df_app["Modalidade"].dropna(), key="linkpgto_modalidade")
 
-        # Seleciona a linha da modalidade
+        # Seleciona a linha da modalidade.
         linha = df_app[df_app["Modalidade"] == modalidade].iloc[0]
         qtd_parcelas = int(linha["Parcelas"])
 
