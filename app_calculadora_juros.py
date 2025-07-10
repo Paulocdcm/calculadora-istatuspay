@@ -38,13 +38,16 @@ with tab1:
         valor_venda = st.number_input("Valor da venda", value=15000.0, min_value=1.0, step=100.0)
         tipo_calculo = st.radio("Tipo de Cálculo", ["Assumindo Juros", "Juros ao Cliente"])
         modalidade = st.selectbox("Modalidade", df_app["Modalidade"].dropna())
-        parcelas_disp = df_app[df_app["Modalidade"] == modalidade]["Parcelas"].unique()
-        qtd_parcelas = st.selectbox("Quantidade de Parcelas", parcelas_disp)
+
+        # Seleciona a linha da modalidade
+        linha = df_app[df_app["Modalidade"] == modalidade].iloc[0]
+        qtd_parcelas = int(linha["Parcelas"])
+
+        st.write(f"**Quantidade de Parcelas:** {qtd_parcelas}")
 
         executar = st.form_submit_button("Executar Simulação")
 
     if executar:
-        linha = df_app[(df_app["Modalidade"] == modalidade) & (df_app["Parcelas"] == qtd_parcelas)].iloc[0]
         taxa = float(linha["Taxa (%)"])
 
         if tipo_calculo == "Assumindo Juros":
@@ -85,13 +88,16 @@ with tab2:
         valor_venda = st.number_input("Valor da venda", value=15000.0, min_value=1.0, step=100.0, key="linkpgto_venda")
         tipo_calculo = st.radio("Tipo de Cálculo", ["Assumindo Juros", "Juros ao Cliente"], key="linkpgto_tipo")
         modalidade = st.selectbox("Modalidade", df_app["Modalidade"].dropna(), key="linkpgto_modalidade")
-        parcelas_disp = df_app[df_app["Modalidade"] == modalidade]["Parcelas"].unique()
-        qtd_parcelas = st.selectbox("Quantidade de Parcelas", parcelas_disp, key="linkpgto_parcelas")
+
+        # Seleciona a linha da modalidade
+        linha = df_app[df_app["Modalidade"] == modalidade].iloc[0]
+        qtd_parcelas = int(linha["Parcelas"])
+
+        st.write(f"**Quantidade de Parcelas:** {qtd_parcelas}")
 
         executar = st.form_submit_button("Executar Simulação")
 
     if executar:
-        linha = df_app[(df_app["Modalidade"] == modalidade) & (df_app["Parcelas"] == qtd_parcelas)].iloc[0]
         taxa = float(linha["Taxa (%)"])
 
         if tipo_calculo == "Assumindo Juros":
@@ -122,4 +128,3 @@ with tab2:
         st.info("Preencha os dados e clique em 'Executar Simulação' para ver o resultado.")
 
     st.caption("Os dados de taxas e simulação são baseados na tabela mais recente da iStatusPay.")
-
