@@ -38,16 +38,25 @@ with tab1:
         valor_venda = st.number_input("Valor da venda", value=15000.0, min_value=1.0, step=100.0)
         tipo_calculo = st.radio("Tipo de Cálculo", ["Assumindo Juros", "Juros ao Cliente"])
         modalidade = st.selectbox("Modalidade", df_app["Modalidade"].dropna())
+<<<<<<< HEAD
 
         # Seleciona a linha da modalidade
         linha = df_app[df_app["Modalidade"] == modalidade].iloc[0]
         qtd_parcelas = int(linha["Parcelas"])
 
         st.write(f"**Quantidade de Parcelas:** {qtd_parcelas}")
+=======
+        parcelas_disp = df_app[df_app["Modalidade"] == modalidade]["Parcelas"].unique()
+        qtd_parcelas = st.selectbox("Quantidade de Parcelas", parcelas_disp)
+>>>>>>> 66a48dd4a5f3380324676b19ce3e90a2476c6245
 
         executar = st.form_submit_button("Executar Simulação")
 
     if executar:
+<<<<<<< HEAD
+=======
+        linha = df_app[(df_app["Modalidade"] == modalidade) & (df_app["Parcelas"] == qtd_parcelas)].iloc[0]
+>>>>>>> 66a48dd4a5f3380324676b19ce3e90a2476c6245
         taxa = float(linha["Taxa (%)"])
 
         if tipo_calculo == "Assumindo Juros":
@@ -88,16 +97,25 @@ with tab2:
         valor_venda = st.number_input("Valor da venda", value=15000.0, min_value=1.0, step=100.0, key="linkpgto_venda")
         tipo_calculo = st.radio("Tipo de Cálculo", ["Assumindo Juros", "Juros ao Cliente"], key="linkpgto_tipo")
         modalidade = st.selectbox("Modalidade", df_app["Modalidade"].dropna(), key="linkpgto_modalidade")
+<<<<<<< HEAD
 
         # Seleciona a linha da modalidade.
         linha = df_app[df_app["Modalidade"] == modalidade].iloc[0]
         qtd_parcelas = int(linha["Parcelas"])
 
         st.write(f"**Quantidade de Parcelas:** {qtd_parcelas}")
+=======
+        parcelas_disp = df_app[df_app["Modalidade"] == modalidade]["Parcelas"].unique()
+        qtd_parcelas = st.selectbox("Quantidade de Parcelas", parcelas_disp, key="linkpgto_parcelas")
+>>>>>>> 66a48dd4a5f3380324676b19ce3e90a2476c6245
 
         executar = st.form_submit_button("Executar Simulação")
 
     if executar:
+<<<<<<< HEAD
+=======
+        linha = df_app[(df_app["Modalidade"] == modalidade) & (df_app["Parcelas"] == qtd_parcelas)].iloc[0]
+>>>>>>> 66a48dd4a5f3380324676b19ce3e90a2476c6245
         taxa = float(linha["Taxa (%)"])
 
         if tipo_calculo == "Assumindo Juros":
@@ -128,3 +146,7 @@ with tab2:
         st.info("Preencha os dados e clique em 'Executar Simulação' para ver o resultado.")
 
     st.caption("Os dados de taxas e simulação são baseados na tabela mais recente da iStatusPay.")
+<<<<<<< HEAD
+=======
+
+>>>>>>> 66a48dd4a5f3380324676b19ce3e90a2476c6245
