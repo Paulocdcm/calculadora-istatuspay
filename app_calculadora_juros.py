@@ -4,7 +4,7 @@ from pdf_utils import botao_pdf
 import pandas as pd
 
 # ------- LOGO NO TOPO ------- #
-st.markdown("<div style='text-align:ledt'>", unsafe_allow_html=True)
+st.markdown("<div style='text-align:left'>", unsafe_allow_html=True)
 st.image("logo/logo.png", width=200)
 st.markdown("</div>", unsafe_allow_html=True)
 
@@ -189,7 +189,6 @@ def simular(valor_venda, tipo_calculo, modalidade, bandeira, tabela_taxas):
             "Valor a Receber": f"R$ {valor_receber:,.2f}",
         }
     elif tipo_calculo == "Juros ao Cliente":
-        # O lojista quer receber 'valor_venda' líquido, o sistema calcula quanto o cliente deve pagar
         valor_total = valor_venda / (1 - taxa) if taxa < 1 else 0
         valor_parcela = valor_total / qtd_parcelas if qtd_parcelas > 0 else 0
         resultado = {
@@ -215,7 +214,12 @@ def main_app():
         bandeiras = list(TAXAS_CALCULADORA.keys())
         bandeira = st.selectbox("Bandeira", bandeiras)
         modalidades = list(TAXAS_CALCULADORA[bandeira].keys())
-        modalidade = st.selectbox("Modalidade", modalidades)
+        simular_todas = st.checkbox("Simular todas as modalidades")
+
+        if simular_todas:
+            modalidade = None
+        else:
+            modalidade = st.selectbox("Modalidade", modalidades)
 
         if "simulacoes_istatuspay" not in st.session_state:
             st.session_state.simulacoes_istatuspay = []
@@ -230,23 +234,37 @@ def main_app():
             st.rerun()
 
         if executar:
-            if not modalidade or modalidade == "" or not valor_venda:
-                st.warning("Selecione a modalidade e informe o valor da venda.")
-            else:
-                resultado, erro = simular(
-                    valor_venda, tipo_calculo, modalidade, bandeira, TAXAS_CALCULADORA
-                )
-                if erro:
-                    st.warning(erro)
+            if simular_todas:
+                resultados = []
+                for mod in modalidades:
+                    resultado, erro = simular(
+                        valor_venda, tipo_calculo, mod, bandeira, TAXAS_CALCULADORA
+                    )
+                    if resultado:
+                        resultados.append(resultado)
+                if not resultados:
+                    st.warning("Nenhuma modalidade disponível para simulação.")
                 else:
-                    st.session_state.simulacoes_istatuspay.append(resultado)
-                    st.success("Simulação adicionada à lista!")
+                    st.session_state.simulacoes_istatuspay.extend(resultados)
+                    st.success("Simulações adicionadas à lista!")
+            else:
+                if not modalidade or modalidade == "" or not valor_venda:
+                    st.warning("Selecione a modalidade e informe o valor da venda.")
+                else:
+                    resultado, erro = simular(
+                        valor_venda, tipo_calculo, modalidade, bandeira, TAXAS_CALCULADORA
+                    )
+                    if erro:
+                        st.warning(erro)
+                    else:
+                        st.session_state.simulacoes_istatuspay.append(resultado)
+                        st.success("Simulação adicionada à lista!")
 
         if st.session_state.simulacoes_istatuspay:
             todas = pd.DataFrame(st.session_state.simulacoes_istatuspay)
             st.markdown("#### Simulações realizadas nesta sessão:")
             st.dataframe(todas, use_container_width=True, hide_index=True)
-            botao_pdf("Simulação IstatusPay", valor_venda, modalidade, tipo_calculo, todas)
+            botao_pdf("Simulação IstatusPay", valor_venda, modalidade if not simular_todas else "Todas", tipo_calculo, todas)
 
     # --- SIMULADOR DE LINKPGTO --- (TABELA 2)
     with tab2:
@@ -254,7 +272,12 @@ def main_app():
         bandeiras = list(TAXAS_LINKPGTO.keys())
         bandeira = st.selectbox("Bandeira", bandeiras, key="link_bandeira")
         modalidades = list(TAXAS_LINKPGTO[bandeira].keys())
-        modalidade = st.selectbox("Modalidade", modalidades, key="linkpgto_modalidade")
+        simular_todas_link = st.checkbox("Simular todas as modalidades", key="simular_todas_linkpgto")
+
+        if simular_todas_link:
+            modalidade = None
+        else:
+            modalidade = st.selectbox("Modalidade", modalidades, key="linkpgto_modalidade")
 
         if "simulacoes_linkpgto" not in st.session_state:
             st.session_state.simulacoes_linkpgto = []
@@ -269,23 +292,37 @@ def main_app():
             st.rerun()
 
         if executar:
-            if not modalidade or modalidade == "" or not valor_venda:
-                st.warning("Selecione a modalidade e informe o valor da venda.")
-            else:
-                resultado, erro = simular(
-                    valor_venda, tipo_calculo, modalidade, bandeira, TAXAS_LINKPGTO
-                )
-                if erro:
-                    st.warning(erro)
+            if simular_todas_link:
+                resultados = []
+                for mod in modalidades:
+                    resultado, erro = simular(
+                        valor_venda, tipo_calculo, mod, bandeira, TAXAS_LINKPGTO
+                    )
+                    if resultado:
+                        resultados.append(resultado)
+                if not resultados:
+                    st.warning("Nenhuma modalidade disponível para simulação.")
                 else:
-                    st.session_state.simulacoes_linkpgto.append(resultado)
-                    st.success("Simulação adicionada à lista!")
+                    st.session_state.simulacoes_linkpgto.extend(resultados)
+                    st.success("Simulações adicionadas à lista!")
+            else:
+                if not modalidade or modalidade == "" or not valor_venda:
+                    st.warning("Selecione a modalidade e informe o valor da venda.")
+                else:
+                    resultado, erro = simular(
+                        valor_venda, tipo_calculo, modalidade, bandeira, TAXAS_LINKPGTO
+                    )
+                    if erro:
+                        st.warning(erro)
+                    else:
+                        st.session_state.simulacoes_linkpgto.append(resultado)
+                        st.success("Simulação adicionada à lista!")
 
         if st.session_state.simulacoes_linkpgto:
             todas = pd.DataFrame(st.session_state.simulacoes_linkpgto)
             st.markdown("#### Simulações realizadas nesta sessão:")
             st.dataframe(todas, use_container_width=True, hide_index=True)
-            botao_pdf("Simulação IstatusPay", valor_venda, modalidade, tipo_calculo, todas)
+            botao_pdf("Simulação LinkPgto", valor_venda, modalidade if not simular_todas_link else "Todas", tipo_calculo, todas)
         st.caption("Os dados de taxas e simulação são baseados na tabela mais recente da IstatusPay.")
 
 if __name__ == "__main__":
